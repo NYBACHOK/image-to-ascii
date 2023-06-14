@@ -1,9 +1,9 @@
 use clap::Parser;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
-use image::{GenericImageView, Pixel};
-use std::alloc::System;
-use std::io::Cursor;
+use image::{GenericImageView};
+
+
 
 #[derive(Parser, Debug)]
 #[command(version)]
@@ -15,10 +15,7 @@ struct Args {
 const WIDTH_SCALE: u32 = 2;
 
 fn main() {
-    let args = Args {
-        path: String::from("-p uran.jpg"),
-    };
-    let mut img = ImageReader::open(Args::try_parse().unwrap_or(args).path)
+    let mut img = ImageReader::open(Args::parse().path)
         .unwrap_or_else(|_| {
             println!("Failed to open image");
             std::process::exit(1)
@@ -33,7 +30,7 @@ fn main() {
     let (width, height) = {
         let (terminal_width, terminal_height) = termion::terminal_size().unwrap();
         let scale = std::cmp::max(
-            (img.width() * WIDTH_SCALE / (terminal_width as u32 - 1)),
+            img.width() * WIDTH_SCALE / (terminal_width as u32 - 1),
             img.height() / terminal_height as u32,
         );
 
