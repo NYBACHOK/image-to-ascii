@@ -17,12 +17,12 @@ const WIDTH_SCALE: u32 = 2;
 fn main() {
     let mut img = ImageReader::open(Args::parse().path)
         .unwrap_or_else(|_| {
-            println!("Failed to open image");
+            eprintln!("Failed to open image");
             std::process::exit(1)
         })
         .decode()
         .unwrap_or_else(|_| {
-            println!("Failed to decode image");
+            eprintln!("Failed to decode image");
             std::process::exit(2)
         })
         .grayscale();
@@ -39,9 +39,9 @@ fn main() {
 
     img = img.resize(width, height, FilterType::Nearest);
 
-    let character_set: [&str; 11] = ["@", "#", "0", "O", "L", ";", ":", ".", ",", "'", " "];
+    const CHARACTER_SET: [&str; 11] = ["@", "#", "0", "O", "L", ";", ":", ".", ",", "'", " "];
 
-    let mut art = String::new();
+    let mut art = String::with_capacity((img.height()*img.width()) as usize);
     let mut last_y = 0;
     for pixel in img.pixels() {
         if last_y != pixel.1 {
@@ -53,8 +53,8 @@ fn main() {
         let brightness: f64 =
             ((pixel_data[0] as u64 + pixel_data[1] as u64 + pixel_data[2] as u64) / 3) as f64;
         let character_position =
-            ((brightness / 255.0) * (character_set.len() - 1) as f64).round() as usize;
-        art.push_str(character_set[character_position])
+            ((brightness / 255.0) * (CHARACTER_SET.len() - 1) as f64).round() as usize;
+        art.push_str(CHARACTER_SET[character_position])
     }
 
     println!("{}", art);
