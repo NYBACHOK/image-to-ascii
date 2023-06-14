@@ -1,9 +1,9 @@
 use clap::Parser;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
+use image::{GenericImageView, Pixel};
 use std::alloc::System;
 use std::io::Cursor;
-use image::{GenericImageView, Pixel};
 
 #[derive(Parser, Debug)]
 #[command(version)]
@@ -15,10 +15,10 @@ struct Args {
 const WIDTH_SCALE: u32 = 2;
 
 fn main() {
-    let args = Args { path : String::from("-p uran.jpg") };
-    let mut img = ImageReader::open(
-        Args::try_parse()
-            .unwrap_or(args).path)
+    let args = Args {
+        path: String::from("-p uran.jpg"),
+    };
+    let mut img = ImageReader::open(Args::try_parse().unwrap_or(args).path)
         .unwrap_or_else(|_| {
             println!("Failed to open image");
             std::process::exit(1)
@@ -59,6 +59,6 @@ fn main() {
             ((brightness / 255.0) * (character_set.len() - 1) as f64).round() as usize;
         art.push_str(character_set[character_position])
     }
-    
+
     println!("{}", art);
 }
