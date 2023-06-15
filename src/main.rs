@@ -1,5 +1,5 @@
 use clap::Parser;
-use eyre::{Result};
+use eyre::{Result, WrapErr};
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
 use image::GenericImageView;
@@ -18,14 +18,11 @@ struct Args {
 
 const WIDTH_SCALE: u32 = 2;
 
-fn main() -> Result<(), ()> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let mut img = ImageReader::open(args.path)
-        .unwrap_or_else(|_| {
-            eprintln!("Failed to open image");
-            std::process::exit(1)
-        })
+        .wrap_err("Failed to open image")?
         .decode()
         .unwrap_or_else(|_| {
             eprintln!("Failed to decode image");
@@ -71,10 +68,7 @@ fn main() -> Result<(), ()> {
             println!("{}", art);
         }
         Some(path) => {
-            let mut file = File::create(path).unwrap_or_else(|_| {
-                eprintln!("Failed to write to file");
-                std::process::exit(3)
-            });
+            let mut file = File::create(path).wrap_err("Failed to create file")?;
 
             file.flush().unwrap();
             file.write_all(art.as_bytes()).unwrap();
