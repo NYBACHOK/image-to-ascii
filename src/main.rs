@@ -1,8 +1,10 @@
+mod character_set;
 mod image_parser;
+mod resize;
 mod video_parser;
 
 use clap::{Parser, ValueEnum};
-use eyre::{Result};
+use eyre::Result;
 
 #[derive(Debug, Clone, ValueEnum)]
 pub enum FileType {
@@ -24,13 +26,19 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    let args = Args::parse();
+    let args = Args::try_parse().unwrap_or(Args{
+        file_type: FileType::Video,
+        path: "~/image.mp4".to_string(),
+        output: None,
+    });
 
     match args.file_type {
         FileType::Image => {
             image_parser::parse_image(args.path.as_str(), args.output)?;
         }
-        FileType::Video => {}
+        FileType::Video => {
+            video_parser::start_playing(args.path.as_str())?;
+        }
     }
 
     Ok(())

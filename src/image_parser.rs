@@ -1,11 +1,11 @@
+use crate::character_set::CHARACTER_SET;
+use crate::resize::get_resized;
 use eyre::{Result, WrapErr};
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
 use image::GenericImageView;
 use std::fs::File;
 use std::io::Write;
-
-const WIDTH_SCALE: u32 = 2;
 
 pub fn parse_image(path: &str, output: Option<String>) -> Result<()> {
     let mut img = ImageReader::open(path)
@@ -18,21 +18,11 @@ pub fn parse_image(path: &str, output: Option<String>) -> Result<()> {
         .grayscale();
 
     let (width, height) = match output {
-        None => {
-            let (terminal_width, terminal_height) = termion::terminal_size().unwrap();
-            let scale = std::cmp::max(
-                img.width() * WIDTH_SCALE / (terminal_width as u32 - 1),
-                img.height() / terminal_height as u32,
-            );
-
-            ((img.width() / scale * WIDTH_SCALE), img.height() / scale)
-        }
+        None => get_resized(img.width(), img.height()),
         Some(_) => (img.width(), img.height()),
     };
 
     img = img.resize(width, height, FilterType::Nearest);
-
-    const CHARACTER_SET: [&str; 11] = ["@", "#", "0", "O", "L", ";", ":", ".", ",", "'", " "];
 
     let mut art = String::with_capacity((img.height() * img.width()) as usize);
     let mut last_y = 0;

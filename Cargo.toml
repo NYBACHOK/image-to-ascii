@@ -10,3 +10,7 @@ image = "0.24.6"
 clap = { version = "4.3.1", features = ["derive"] }
 termion = "2.0.1"
 eyre = "0.6.8"
+opencv = { version = "0.82.0", features = ["rgb"] }
+clang-sys = "1.6.1"
+rgb = "0.8.36"
+ansi_rgb = "0.3.2-alpha"
